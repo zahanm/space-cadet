@@ -1,6 +1,6 @@
 {
   "name": "space-cadet",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Dealing with unwanted whitespace",
   "main": "cadet.js",
   "scripts": {

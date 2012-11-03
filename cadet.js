@@ -13,16 +13,18 @@ var argv = require('optimist')
   'e': {
     alias: "ext",
     demand: true,
+    type: 'string',
     desc: "files matching this extension will be checked"
   },
   'v': {
     alias: "verbose",
-    default: false,
+    type: 'boolean',
     desc: "enable verbose output"
   },
   'd': {
     alias: "depth",
     default: 1,
+    type: 'number',
     desc: "filesystem depth to recurse into, use 0 for infinity"
   }
 })
@@ -94,7 +96,9 @@ function blastOff() {
   var lightyears = 1;
   sectors = [ launchpad ];
   async.whilst(
-    function () { return argv.depth === 0 || lightyears <= argv.depth; },
+    function () {
+      return !!sectors.length && (argv.depth === 0 || lightyears <= argv.depth);
+    },
     function (next) {
       toexplore = [];
       async.forEachSeries(
