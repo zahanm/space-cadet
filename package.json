@@ -1,0 +1,22 @@
+{
+  "name": "space-cadet",
+  "version": "0.0.1",
+  "description": "Dealing with unwanted whitespace",
+  "main": "cadet.js",
+  "scripts": {
+    "test": "node cadet.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/zahanm/space-cadet.git"
+  },
+  "keywords": [
+    "whitespace",
+    "util"
+  ],
+  "author": "Zahan Malkani <z@zahanm.com>",
+  "license": "MIT",
+  "dependencies": {
+    "optimist": "~0.3.5"
+  }
+}
