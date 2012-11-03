@@ -17,12 +17,13 @@ var argv = require('optimist')
   },
   'v': {
     alias: "verbose",
+    default: false,
     desc: "enable verbose output"
   },
   'd': {
     alias: "depth",
     default: 1,
-    desc: "filesystem depth to recurse into checking for files"
+    desc: "filesystem depth to recurse into, use 0 for infinity"
   }
 })
 .argv;
@@ -30,9 +31,12 @@ var argv = require('optimist')
 /*
 Global state
 */
-var launchpad;
 var explorationlimit = 5;
 var lineSep = "\n";
+
+/*
+Explorers
+*/
 
 function abortLaunch(err) {
   if (err) {
@@ -50,31 +54,35 @@ function mutations(raw) {
   }).join(lineSep);
 }
 
-function visitSector(location) {
+function visitSector(location, callback) {
   fs.readdir(location, function (err, files) {
     abortLaunch(err);
     if (argv.verbose) console.log("> " + location);
     async.forEachLimit(files, explorationlimit, function (f, next) {
-      if (path.extname(f) !== argv.ext) {
+      // ss = solar system
+      var ss = path.join(location, f);
+      var info = fs.statSync(ss);
+      if (!info.isFile() || path.extname(ss) !== argv.ext) {
         next();
         return;
       }
-      fs.readFile(path.join(location, f), 'utf8', function (err, data) {
-        abortLaunch(err);
-        if (argv.verbose) console.log(". " + path.join(location, f));
+      fs.readFile(ss, 'utf8', function (err, data) {
+        if (err) { next(err); }
+        if (argv.verbose) console.log(". " + ss);
         var clean = mutations( String(data) );
-        fs.writeFile(path.join(location, f), clean, 'utf8', function (err) {
-          abortLaunch(err);
+        fs.writeFile(ss, clean, 'utf8', function (err) {
+          if (err) { next(err); }
           next();
         });
       });
     }, function (err) {
-      abortLaunch(err);
+      callback(err);
     });
   });
 }
 
 function blastOff() {
+  var launchpad, sector;
   if (argv._.length) {
     launchpad = argv._[0];
   } else {
@@ -83,7 +91,44 @@ function blastOff() {
   if (argv.ext[0] !== '.') {
     argv.ext = "." + argv.ext.trim();
   }
-  visitSector(launchpad);
+  var lightyears = 1;
+  sectors = [ launchpad ];
+  async.whilst(
+    function () { return argv.depth === 0 || lightyears <= argv.depth; },
+    function (next) {
+      toexplore = [];
+      async.forEachSeries(
+        sectors,
+        function (sector, nextSector) {
+          visitSector(sector, function (err) {
+            if (err) { nextSector(err); }
+            fs.readdir(sector, function (err, files) {
+              if (err) { nextSector(err); }
+              toexplore.push.apply(toexplore, files.filter(function (f) {
+                // gal = galaxy
+                var gal = path.join(sector, f);
+                var info = fs.statSync(gal);
+                return info.isDirectory();
+              }).map(function (f) {
+                return path.join(sector, f);
+              }));
+              nextSector();
+            });
+          });
+        },
+        function (err) {
+          if (err) { next(err); }
+          lightyears++;
+          sectors = toexplore;
+          next();
+        }
+      );
+    },
+    function (err) {
+      abortLaunch(err);
+      if (argv.verbose) console.log("---");
+    }
+  );
 }
 
 if (require.main == module) {
