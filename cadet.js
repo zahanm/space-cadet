@@ -43,6 +43,13 @@ function abortLaunch(err) {
   }
 }
 
+function mutations(raw) {
+  var rawlines = raw.split(lineSep);
+  return rawlines.map(function (line) {
+    return line.trimRight();
+  }).join(lineSep);
+}
+
 function visitSector(location) {
   fs.readdir(location, function (err, files) {
     abortLaunch(err);
@@ -55,11 +62,8 @@ function visitSector(location) {
       fs.readFile(path.join(location, f), 'utf8', function (err, data) {
         abortLaunch(err);
         if (argv.verbose) console.log(". " + path.join(location, f));
-        var rawlines = String(data).split(lineSep);
-        var stripped = rawlines.map(function (raw) {
-          return raw.trimRight();
-        }).join(lineSep);
-        fs.writeFile(path.join(location, f), stripped, 'utf8', function (err) {
+        var clean = mutations( String(data) );
+        fs.writeFile(path.join(location, f), clean, 'utf8', function (err) {
           abortLaunch(err);
           next();
         });
