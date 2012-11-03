@@ -1,15 +1,17 @@
 
 var argv = require("optimist")
 .usage("Clean up unwanted whitespace.\nUsage: $0 [-r]")
-.demand('e')
-.default('d', 1)
-.alias({
-  'd': "depth",
-  'e': "extension"
-})
-.describe({
-  'd': "filesystem depth to recurse into checking for files",
-  'e': "files matching this extension will be checked"
+.options({
+  'e': {
+    alias: "extension",
+    demand: true,
+    desc: "files matching this extension will be checked"
+  },
+  'd': {
+    alias: "depth",
+    default: 1,
+    desc: "filesystem depth to recurse into checking for files"
+  }
 })
 .argv;
 
