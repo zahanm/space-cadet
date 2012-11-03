@@ -6,6 +6,9 @@
   "scripts": {
     "test": "node cadet.js"
   },
+  "bin": {
+    "cadet": "./cli.sh"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/zahanm/space-cadet.git"
