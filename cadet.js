@@ -8,7 +8,7 @@ var path = require("path");
 var async = require("async");
 
 var argv = require('optimist')
-.usage("Clean up unwanted whitespace.\nUsage: $0 <dir>")
+.usage("Clean up unwanted whitespace.\nUsage: cadet [flags] <dir>")
 .options({
   'e': {
     alias: "ext",
