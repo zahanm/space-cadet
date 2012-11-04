@@ -135,6 +135,6 @@ function blastOff() {
   );
 }
 
-if (require.main == module) {
+exports.run = function () {
   blastOff();
 }

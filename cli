@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+
+var path = require('path');
+var fs   = require('fs');
+var cadet  = path.join(path.dirname(fs.realpathSync(__filename)), 'cadet.js');
+
+require(cadet).run();

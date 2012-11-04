@@ -7,7 +7,7 @@
     "test": "node cadet.js"
   },
   "bin": {
-    "cadet": "./cli.sh"
+    "cadet": "./cli"
   },
   "repository": {
     "type": "git",
